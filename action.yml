@@ -1,0 +1,12 @@
+name: 'LineLint Action'
+description: 'Run LineLint on project'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: install linelint
+      run: cargo install linelint-cli
+      shell: bash
+    - name: run linelint
+      run: linelint check
+      shell: bash
