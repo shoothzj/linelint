@@ -1,0 +1,13 @@
+[package]
+name = "linelint"
+version = "0.0.1"
+edition = "2021"
+description = "Line lint library"
+license = "Apache-2.0"
+repository = "https://github.com/shoothzj/linelint"
+homepage = "https://github.com/shoothzj/linelint"
+categories = ["development-tools"]
+keywords = ["development"]
+
+[dependencies]
+ignore = "0.4"

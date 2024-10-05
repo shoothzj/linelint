@@ -1,0 +1,16 @@
+[package]
+name = "linelint-cli"
+version = "0.0.1"
+edition = "2021"
+description = "Line lint cli"
+license = "Apache-2.0"
+repository = "https://github.com/shoothzj/linelint"
+homepage = "https://github.com/shoothzj/linelint"
+
+[dependencies]
+linelint = {path = "../linelint"}
+clap = { version = "4.5", features = ["derive"] }
+
+[[bin]]
+name = "linelint"
+path = "src/main.rs"
