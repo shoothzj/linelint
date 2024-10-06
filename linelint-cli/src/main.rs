@@ -18,6 +18,7 @@ fn check(current_dir: &Path, linter: &Linter) {
                         issue.rule, issue.description, issue.filename, issue.line_number
                     );
                 }
+                std::process::exit(2);
             }
         }
         Err(errors) => {
