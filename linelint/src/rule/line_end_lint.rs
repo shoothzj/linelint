@@ -11,6 +11,11 @@ impl LintRule for LineEndLint {
 
     fn check(&self, config: &Config, filename: &str, content: &str) -> Vec<Issue> {
         let mut issues = Vec::new();
+
+        if content.is_empty() {
+            return issues;
+        }
+
         if !content.ends_with(config.line_ending.get_ending(content)) {
             issues.push(Issue::new(
                 LINE_END_RULE_NAME,
@@ -23,6 +28,10 @@ impl LintRule for LineEndLint {
     }
 
     fn format(&self, config: &Config, content: &str) -> String {
+        if content.is_empty() {
+            return content.to_string();
+        }
+
         let mut formatted_content = content.to_string();
         let line_ending = config.line_ending.get_ending(content);
         if !formatted_content.ends_with(line_ending) {
@@ -94,6 +103,53 @@ mod tests {
         assert_eq!(
             formatted, content,
             "The content should not be changed if the correct line ending is present"
+        );
+    }
+
+    #[test]
+    fn test_line_end_lint_format_empty_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "";
+
+        let formatted = lint.format(&config, content);
+        assert_eq!(formatted, "", "Empty file will not changed");
+    }
+
+    #[test]
+    fn test_line_end_lint_check_only_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "\n";
+        let filename = "test_file.rs";
+
+        let issues = lint.check(&config, filename, content);
+        assert_eq!(issues.len(), 0, "There should be no issue");
+    }
+
+    #[test]
+    fn test_line_end_lint_format_only_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "\n";
+
+        let formatted = lint.format(&config, content);
+        assert_eq!(
+            formatted, "\n",
+            "The formatted content should end with the correct line ending"
+        );
+    }
+
+    #[test]
+    fn test_line_end_lint_format_only_line_file_windows() {
+        let config = Config::new(LineEnding::Windows);
+        let lint = LineEndLint {};
+        let content = "\r\n";
+
+        let formatted = lint.format(&config, content);
+        assert_eq!(
+            formatted, "\r\n",
+            "The formatted content should end with the correct line ending"
         );
     }
 }
