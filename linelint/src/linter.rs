@@ -96,7 +96,7 @@ impl<'a> Linter<'a> {
                         continue;
                     }
 
-                    if let Ok(content) = std::fs::read(entry.path()) {
+                    if let Ok(content) = fs::read(entry.path()) {
                         if std::str::from_utf8(&content).is_err() {
                             continue;
                         }
