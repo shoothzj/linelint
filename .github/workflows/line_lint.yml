@@ -10,4 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: cargo build
+      - run: cargo build --release
+      - run: mv target/release/linelint cli
+      - run: ./cli check
