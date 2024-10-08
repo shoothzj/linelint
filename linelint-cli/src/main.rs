@@ -42,7 +42,7 @@ fn format(current_dir: &Path, linter: &Linter) {
 
 fn main() {
     let matches = Command::new("linelint-cli")
-        .version("0.0.1")
+        .version("0.0.2")
         .about("A command-line tool for linting and fixing line formatting issues")
         .subcommand(Command::new("check").about("Check files for lint issues"))
         .subcommand(Command::new("format").about("Automatically format files to fix lint issues"))
