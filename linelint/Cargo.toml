@@ -11,3 +11,4 @@ keywords = ["development"]
 
 [dependencies]
 ignore = "0.4"
+regex = "1.11.0"

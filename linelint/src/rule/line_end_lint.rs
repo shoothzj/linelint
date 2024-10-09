@@ -16,11 +16,21 @@ impl LintRule for LineEndLint {
             return issues;
         }
 
-        if !content.ends_with(config.line_ending.get_ending(content)) {
+        let line_ending = config.line_ending.get_ending(content);
+        let double_line_ending = format!("{}{}", line_ending, line_ending);
+
+        if !content.ends_with(line_ending) {
             issues.push(Issue::new(
                 LINE_END_RULE_NAME,
                 filename,
                 "File does not end with the expected line ending",
+                content.lines().count(),
+            ));
+        } else if content.ends_with(&double_line_ending) {
+            issues.push(Issue::new(
+                LINE_END_RULE_NAME,
+                filename,
+                "File has multiple trailing line endings",
                 content.lines().count(),
             ));
         }
@@ -33,7 +43,12 @@ impl LintRule for LineEndLint {
         }
 
         let mut formatted_content = content.to_string();
+
         let line_ending = config.line_ending.get_ending(content);
+
+        let re = regex::Regex::new(&format!(r"({})+$", line_ending)).unwrap();
+        formatted_content = re.replace(&formatted_content, line_ending).to_string();
+
         if !formatted_content.ends_with(line_ending) {
             formatted_content.push_str(line_ending);
         }
@@ -114,6 +129,80 @@ mod tests {
 
         let formatted = lint.format(&config, content);
         assert_eq!(formatted, "", "Empty file will not changed");
+    }
+
+    #[test]
+    fn test_line_end_lint_check_two_empty_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "\n\n";
+        let filename = "test_file.rs";
+
+        let issues = lint.check(&config, filename, content);
+        assert_eq!(
+            issues.len(),
+            1,
+            "There should be one issue for two line endings"
+        );
+    }
+
+    #[test]
+    fn test_line_end_lint_check_three_empty_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "\n\n\n";
+        let filename = "test_file.rs";
+
+        let issues = lint.check(&config, filename, content);
+        assert_eq!(
+            issues.len(),
+            1,
+            "There should be one issue for three line endings"
+        );
+    }
+
+    #[test]
+    fn test_line_end_lint_check_not_change_middle_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "c\n\nd\n";
+        let filename = "test_file.rs";
+
+        let issues = lint.check(&config, filename, content);
+        assert_eq!(issues.len(), 0, "There should be no issue");
+    }
+
+    #[test]
+    fn test_line_end_lint_format_two_empty_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "\n\n";
+
+        let formatted = lint.format(&config, content);
+        assert_eq!(formatted, "\n", "two line will be formatted");
+    }
+
+    #[test]
+    fn test_line_end_lint_format_three_empty_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "\n\n\n";
+
+        let formatted = lint.format(&config, content);
+        assert_eq!(formatted, "\n", "three line will be formatted");
+    }
+
+    #[test]
+    fn test_line_end_lint_format_not_change_middle_line_file() {
+        let config = Config::new(LineEnding::Unix);
+        let lint = LineEndLint {};
+        let content = "c\n\nd\n";
+
+        let formatted = lint.format(&config, content);
+        assert_eq!(
+            formatted, "c\n\nd\n",
+            "middle multi line should not changed"
+        );
     }
 
     #[test]
