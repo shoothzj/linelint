@@ -13,3 +13,7 @@ Ensures files end with a newline (`\n`).
 Flags trailing spaces at the end of lines.
 
 **Fix:** Remove trailing spaces.
+
+### .linelintignore
+
+add file .linelintignore in your project to ignore dir or file when use linelint

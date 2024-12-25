@@ -59,7 +59,9 @@ impl<'a> Linter<'a> {
     {
         let mut errors = Vec::new();
 
-        let walker = WalkBuilder::new(dir)
+        let mut builder = WalkBuilder::new(dir);
+
+        builder
             .ignore(false)
             .hidden(false)
             .follow_links(true)
@@ -67,8 +69,11 @@ impl<'a> Linter<'a> {
             .require_git(false)
             .git_exclude(true)
             .git_global(true)
-            .git_ignore(true)
-            .build();
+            .git_ignore(true);
+
+        builder.add_ignore(".linelintignore");
+
+        let walker = builder.build();
 
         for entry in walker {
             match entry {
